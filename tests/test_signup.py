@@ -51,3 +51,20 @@ def test_signup_returns_bad_request_for_existing_participant(client):
     # Assert
     assert response.status_code == 400
     assert payload["detail"] == "Student already signed up"
+
+
+def test_signup_rejects_invalid_email(client):
+    # Arrange
+    activity_name = "Chess Club"
+    invalid_email = "not-an-email"
+
+    # Act
+    response = client.post(
+        f"/activities/{activity_name}/signup",
+        params={"email": invalid_email},
+    )
+    payload = response.json()
+
+    # Assert
+    assert response.status_code == 422
+    assert any("email" in str(error).lower() for error in payload["detail"])
